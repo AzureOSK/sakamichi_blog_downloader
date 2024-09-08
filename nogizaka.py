@@ -5,36 +5,9 @@ from pathlib import Path
 
 def download_images(ct_number, output_folder_path):
 
-    cookies = {
-        'WAPID': 'no9pUG4vBB3d9E2xt0TMTtm50wOYfrQKMir',
-        'wap_last_event': 'showWidgetPage',
-        'wovn_selected_lang': 'ja',
-    }
-
-    headers = {
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'accept-language': 'en-US,en;q=0.9,ja;q=0.8,de;q=0.7',
-        'cache-control': 'no-cache',
-        # 'cookie': 'WAPID=no9pUG4vBB3d9E2xt0TMTtm50wOYfrQKMir; wap_last_event=showWidgetPage; wovn_selected_lang=ja',
-        'dnt': '1',
-        'pragma': 'no-cache',
-        'priority': 'u=0, i',
-        'sec-ch-ua': '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'document',
-        'sec-fetch-mode': 'navigate',
-        'sec-fetch-site': 'none',
-        'sec-fetch-user': '?1',
-        'upgrade-insecure-requests': '1',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
-    }
-
     params = {
-        # 'ima': '0029',
         'page': '0',
         'ct': ct_number, # 48009 etc
-        # 'cd': 'MEMBER',
     }
 
     # response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER/list', params=params, cookies=cookies, headers=headers)
@@ -51,7 +24,7 @@ def download_images(ct_number, output_folder_path):
         params["page"] = i
         print(f"Parsing blog page: {i}")
 
-        response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER/list', params=params, cookies=cookies, headers=headers)
+        response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER/list', params=params)
 
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -74,7 +47,7 @@ def download_images(ct_number, output_folder_path):
 
         print(f"Getting image urls from {blog_url}")
 
-        response = requests.get(blog_url, params=params, cookies=cookies, headers=headers)
+        response = requests.get(blog_url, params=params)
 
         soup = BeautifulSoup(response.text, 'html.parser')
 
