@@ -1,7 +1,3 @@
 .venv/
 
-miku_photos
-rei_photos
-saachan_photos
-Kakehashi Sayaka Blog Photos (2024-08-30 Archive)
-Seimiya Rei Blog Photos (2024-08-30 Archive)
+output/*
