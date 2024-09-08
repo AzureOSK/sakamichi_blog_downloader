@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 def download_images(ct_number, output_folder_name):
 
@@ -61,7 +62,8 @@ def download_images(ct_number, output_folder_name):
         href_list = [f"https://www.nogizaka46.com{x.get("href")}" for x in blog_urls]
         blog_url_list.extend(href_list)
 
-        datetimes = [x.find('p', {'class': "bl--card__date"}).text.replace(".", "_").replace(" ", "_-_").replace(":", "_") for x in blog_urls]
+        fix_datetimes = lambda x: datetime.strptime(x.replace("\n", "").strip(), '%Y.%m.%d %H:%M').strftime('%Y_%m_%d_-_%H_%M')
+        datetimes = [fix_datetimes(x.find('p', {'class': "bl--card__date"}).text) for x in blog_urls]
         datetime_list.extend(datetimes)
 
     img_url_list = []
