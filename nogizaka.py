@@ -45,7 +45,7 @@ def download_images(ct_number, output_folder_path):
     img_url_list = []
     for i, blog_url in enumerate(blog_url_list):
 
-        print(f"Getting image urls from {blog_url}")
+        print(f"Getting image urls from {i}: {blog_url}")
 
         response = requests.get(blog_url, params=params)
 
@@ -54,7 +54,7 @@ def download_images(ct_number, output_folder_path):
         img_urls = soup.find_all('img')
 
         src_list = [(f"https://www.nogizaka46.com{x.get("src")}", 
-                    f"{datetime_list[i]}_-_{x.get("src").split("/")[-1]}") for x in img_urls]
+                    f"{datetime_list[i]}_-_{x.get("src").split("/")[-1]}") for x in img_urls if x.get("src") is not None]
 
         img_url_list.extend(src_list)
 
@@ -84,4 +84,4 @@ def download_images(ct_number, output_folder_path):
     return None
 
 if __name__ == "__main__":
-    download_images(ct_number = 48006, output_folder_path = "sakuchan_photos")
+    download_images(ct_number = 55391, output_folder_path = r"C:\Users\Ryan\satsuki_photos")

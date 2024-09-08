@@ -46,7 +46,7 @@ def download_images(ct_number, output_folder_name):
     img_url_list = []
     for i, blog_url in enumerate(blog_url_list):
 
-        print(f"Getting image urls from {blog_url}")
+        print(f"Getting image urls from {i}: {blog_url}")
 
         response = requests.get(blog_url, params=params)
 
