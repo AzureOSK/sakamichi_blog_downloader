@@ -2,8 +2,19 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
+import argparse
 
-def download_images(ct_number, output_folder_name):
+parser = argparse.ArgumentParser(
+     prog='Nogizaka Blog Photos Downloader',
+     description="This program downloads photos from Nogizaka blogs.")
+
+parser.add_argument('-c', '--ct_number', type = int, help = "When you go to the page with all of the members' blogs as selected in the dropdown menu in https://www.hinatazaka46.com/s/official/diary/member?ima=0000, there will be a 'ct' number in the URL. E.g. for Kanemura Miku (https://www.hinatazaka46.com/s/official/diary/member/list?ima=0000&ct=12) the ct number is 12")
+parser.add_argument('-d', '--download_location', type = str, help = r"The download location for the downloaded messages; can be relative or absolute. E.g. 'C:\Users\<your username>\Downloads\miku_photos' or just 'miku_photos'")
+args = parser.parse_args()
+CT_NUMBER = args.ct_number
+OUTPUT_FOLDER_PATH = args.download_location
+
+def download_images(ct_number, output_folder_path):
 
     params = {
         'page': '0',
@@ -85,4 +96,5 @@ def download_images(ct_number, output_folder_name):
     return None
 
 if __name__ == "__main__":
-    print(download_images(ct_number = 12, output_folder_name = "miku_photos"))
+    download_images(CT_NUMBER, OUTPUT_FOLDER_PATH)
+    #download_images(ct_number = 12, output_folder_name = "miku_photos")

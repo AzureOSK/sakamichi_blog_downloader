@@ -8,8 +8,8 @@ parser = argparse.ArgumentParser(
      prog='Nogizaka Blog Photos Downloader',
      description="This program downloads photos from Nogizaka blogs.")
 
-parser.add_argument('-c', '--ct_number', type = int, help = "When you go to the page with all of the member's blogs as selected in the dropdown menu in https://www.nogizaka46.com/s/n46/diary/MEMBER, there will be a 'ct' number in the URL. E.g. for Ioki Mao (https://www.nogizaka46.com/s/n46/diary/MEMBER/list?ima=0022&ct=55396) the ct number is 55396")
-parser.add_argument('-d', '--download_location', type = str, help = r"The download location for the downloaded messages; can be relative or absolute. E.g. 'C:\Users\<your username>\Downloads\satsuki_photos")
+parser.add_argument('-c', '--ct_number', type = int, help = "When you go to the page with all of the members' blogs as selected in the dropdown menu in https://www.nogizaka46.com/s/n46/diary/MEMBER, there will be a 'ct' number in the URL. E.g. for Sugawara Satsuki (https://www.nogizaka46.com/s/n46/diary/MEMBER/list?ima=0520&ct=55391) the ct number is 55391")
+parser.add_argument('-d', '--download_location', type = str, help = r"The download location for the downloaded messages; can be relative or absolute. E.g. 'C:\Users\<your username>\Downloads\satsuki_photos' or just 'satsuki_photos'")
 args = parser.parse_args()
 CT_NUMBER = args.ct_number
 OUTPUT_FOLDER_PATH = args.download_location
@@ -96,4 +96,4 @@ def download_images(ct_number, output_folder_path):
 
 if __name__ == "__main__":
     download_images(CT_NUMBER, OUTPUT_FOLDER_PATH)
-    # download_images(ct_number = 55391, output_folder_path = r"C:\Users\Ryan\satsuki_photos")
+    # download_images(ct_number = 55391, output_folder_path = "satsuki_photos")
