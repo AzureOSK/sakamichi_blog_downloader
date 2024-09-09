@@ -3,4 +3,4 @@
 output/*
 build
 dist
-nogizaka.spec
+*.spec
