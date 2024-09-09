@@ -59,6 +59,8 @@ def download_images(ct_number, output_folder_path):
 
         print(f"Getting image urls from {i}: {blog_url}")
 
+        blog_id = blog_url.split("/")[-1].split("?")[0]
+
         response = requests.get(blog_url, params=params)
 
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -66,7 +68,7 @@ def download_images(ct_number, output_folder_path):
         img_urls = soup.find_all('img')
 
         src_list = [(x.get("src"), 
-                     f"{datetime_list[i]}_-_{x.get("src").split("/")[-1]}") for x in img_urls if "diary" in x.get("src")]
+                     f"{datetime_list[i]}_-_{blog_id}_-_{x.get("src").split("/")[-1]}") for x in img_urls if "diary" in x.get("src")]
 
         img_url_list.extend(src_list)
 
