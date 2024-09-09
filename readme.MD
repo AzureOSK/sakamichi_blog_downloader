@@ -13,7 +13,7 @@
 4. This means her ct_number is `55391`.
 5. In cmd or powershell, run `./nogizaka_blog_downloader --ctnumber 55391 --download_location "satsuki_photos"`
     - You can also run `./nogizaka_blog_downloader --ctnumber 55391 --download_location "C:\Users\<your username>\satsuki_photos"`
-6. Press Enter and let the script run, and when it finishes, all the photos should be downloaded to the locatuion specified in `--download_location`
+6. Press Enter and let the script run, and when it finishes, all the photos should be downloaded to the location specified in `--download_location`
 
 ## If downloading photos from a Hinatazaka blog
 1. Go to [https://www.hinatazaka46.com/s/official/diary/member?ima=0000](https://www.hinatazaka46.com/s/official/diary/member?ima=00005)
@@ -22,4 +22,4 @@
 4. This means her ct_number is `12`.
 5. In cmd or powershell, run `./hinatazaka_blog_downloader --ctnumber 12 --download_location "osushi_photos"`
     - You can also run `./hinatazaka_blog_downloader --ctnumber 12 --download_location "C:\Users\<your username>\osushi_photos"`
-6. Press Enter and let the script run, and when it finishes, all the photos should be downloaded to the locatuion specified in `--download_location`
+6. Press Enter and let the script run, and when it finishes, all the photos should be downloaded to the location specified in `--download_location`
