@@ -80,18 +80,22 @@ def download_images(ct_number, output_folder_path):
 
     # For each img_url and filename combination, save 
     for (img_url, filename) in reversed(img_url_list):
-        
-        output_file_path = output_folder_path/filename
+            
+            output_file_path = output_folder_path/filename
 
-        # If file doesn't exist, downloadit, else print info and don't download
-        if not output_file_path.is_file():
-            image = requests.get(img_url)
-            print(f"Downloading {img_url} to {output_file_path.resolve()}")
-            with open(output_file_path, 'wb') as f:
-                f.write(image.content)
-            photos_downloaded += 1
-        else:
-            print(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
+            # If file doesn't exist, download it, else print info and don't download
+            if not output_file_path.is_file():
+                try:
+                    print(f"Downloading {img_url} to {output_file_path.resolve()}")
+                    image = requests.get(img_url)
+                    with open(output_file_path, 'wb') as f:
+                        f.write(image.content)
+                    photos_downloaded += 1
+                except:
+                    print(f"Couldn't download {img_url}!")
+                    continue
+            else:
+                print(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
 
     print(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
 

@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 import argparse
+import os
 
 parser = argparse.ArgumentParser(
      prog='Nogizaka Blog Photos Downloader',
@@ -26,73 +27,102 @@ def download_images(ct_number, output_folder_path):
     # blog_urls = soup.find_all('a', {'class': "bl--card js-pos a--op hv--thumb"})
     # blog_urls[0].get("href")
 
-    # Get list of blog urls, list of datetimes
-    blog_url_list = []
-    datetime_list = []
-    i = -1
-    while True:
-        i = i + 1
-        params["page"] = i
-        print(f"Parsing blog page: {i}")
+    # If output_folder_path is None, set current working directory as output path
+    if output_folder_path is None:
+        output_folder_path = Path(os.getcwd())
 
-        response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER/list', params=params)
-
+    # If ct_number is None, download all available member blogs
+    if ct_number is None:
+        response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER', params=params)
         soup = BeautifulSoup(response.text, 'html.parser')
-
-        blog_urls = soup.find_all('a', {'class': "bl--card js-pos a--op hv--thumb"})
-
-        # End of pages
-        if blog_urls[0].find('p', {'class': "bl--card__ttl"}).text == '該当するデータがございません':
-            break
-
-        href_list = [f"https://www.nogizaka46.com{x.get("href")}" for x in blog_urls]
-        blog_url_list.extend(href_list)
-
-        fix_datetimes = lambda x: datetime.strptime(x.replace("\n", "").strip(), '%Y.%m.%d %H:%M').strftime('%Y_%m_%d_-_%H_%M')
-        datetimes = [fix_datetimes(x.find('p', {'class': "bl--card__date"}).text) for x in blog_urls]
-        datetime_list.extend(datetimes)
-
-    # For each blog url, get list of image urls in the form of tuple (image url, date_time_-_imagename.ext)
-    img_url_list = []
-    for i, blog_url in enumerate(blog_url_list):
-
-        print(f"Getting image urls from {i}: {blog_url}")
-
-        blog_id = blog_url.split("/")[-1].split("?")[0]
-
-        response = requests.get(blog_url, params=params)
-
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        img_urls = soup.find_all('img')
-
-        src_list = [(f"https://www.nogizaka46.com{x.get("src")}", 
-                    f"{datetime_list[i]}_-_{blog_id}_-_{x.get("src").split("/")[-1]}") for x in img_urls if x.get("src") is not None]
-
-        img_url_list.extend(src_list)
-
-    # Create output folder if folder does not exist
-    output_folder_path = Path(output_folder_path)
-    output_folder_path.mkdir(parents=True, exist_ok=True)
-
-    photos_downloaded = 0
-
-    # For each img_url and filename combination, save 
-    for (img_url, filename) in reversed(img_url_list):
+        member_blog_list = [
+            (
+                x.find('p', {'class': "ba--mmsel__pc__neme f--head"}).text, 
+                x.get("href").split("ct=")[-1]
+            ) for x in soup.find_all('a', {'class': "ba--mmsel__pc__a hv--op"})
+            ]
         
-        output_file_path = output_folder_path/filename
+        for member_name, ct_number in member_blog_list:
+            print(f"Downloading {member_name}")
+            download_images(ct_number, output_folder_path)
 
-        # If file doesn't exist, downloadit, else print info and don't download
-        if not output_file_path.is_file():
-            image = requests.get(img_url)
-            print(f"Downloading {img_url} to {output_file_path.resolve()}")
-            with open(output_file_path, 'wb') as f:
-                f.write(image.content)
-            photos_downloaded += 1
-        else:
-            print(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
+    # Else, if ct_number is not None, download only photos from one member
+    else:
+        # Get list of blog urls, list of datetimes
+        blog_url_list = []
+        datetime_list = []
+        i = -1
+        while True:
+            i = i + 1
+            params["page"] = i
+            print(f"Parsing blog page: {i}")
 
-    print(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
+            response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER/list', params=params)
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Get member name for use in folder name
+            if i == 0:
+                member_name = soup.find('p', {'class': "bd--prof__name f--head"}).text
+
+            blog_urls = soup.find_all('a', {'class': "bl--card js-pos a--op hv--thumb"})
+
+            # End of pages
+            if blog_urls[0].find('p', {'class': "bl--card__ttl"}).text == '該当するデータがございません':
+                break
+
+            href_list = [f"https://www.nogizaka46.com{x.get("href")}" for x in blog_urls]
+            blog_url_list.extend(href_list)
+
+            fix_datetimes = lambda x: datetime.strptime(x.replace("\n", "").strip(), '%Y.%m.%d %H:%M').strftime('%Y_%m_%d_-_%H_%M')
+            datetimes = [fix_datetimes(x.find('p', {'class': "bl--card__date"}).text) for x in blog_urls]
+            datetime_list.extend(datetimes)
+
+        # For each blog url, get list of image urls in the form of tuple (image url, date_time_-_imagename.ext)
+        img_url_list = []
+        for i, blog_url in enumerate(blog_url_list):
+
+            print(f"Getting image urls from {i}: {blog_url}")
+
+            blog_id = blog_url.split("/")[-1].split("?")[0]
+
+            response = requests.get(blog_url, params=params)
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            img_urls = soup.find_all('img')
+
+            src_list = [(f"https://www.nogizaka46.com{x.get("src")}", 
+                        f"{datetime_list[i]}_-_{blog_id}_-_{x.get("src").split("/")[-1]}") for x in img_urls if x.get("src") is not None]
+
+            img_url_list.extend(src_list)
+
+        # Create output folder if folder does not exist
+        output_folder_path = Path(output_folder_path)/member_name
+        output_folder_path.mkdir(parents=True, exist_ok=True)
+
+        photos_downloaded = 0
+
+        # For each img_url and filename combination, save 
+        for (img_url, filename) in reversed(img_url_list):
+            
+            output_file_path = output_folder_path/filename
+
+            # If file doesn't exist, download it, else print info and don't download
+            if not output_file_path.is_file():
+                try:
+                    print(f"Downloading {img_url} to {output_file_path.resolve()}")
+                    image = requests.get(img_url)
+                    with open(output_file_path, 'wb') as f:
+                        f.write(image.content)
+                    photos_downloaded += 1
+                except:
+                    print(f"Couldn't download {img_url}!")
+                    continue
+            else:
+                print(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
+
+        print(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
 
     return None
 
