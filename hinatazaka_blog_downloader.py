@@ -64,7 +64,7 @@ def download_images(ct_number, output_folder_path):
 
             # Get member name for use in folder name
             if i == 0:
-                member_name = soup.find('p', {'class': "bd--prof__name f--head"}).text
+                member_name = soup.find('div', {'class': "c-blog-member__name"}).text.strip()
 
             blog_urls = soup.find_all('a', {'class': "c-button-blog-detail"})
 
@@ -93,6 +93,8 @@ def download_images(ct_number, output_folder_path):
             soup = BeautifulSoup(response.text, 'html.parser')
 
             img_urls = soup.find_all('img')
+
+            img_urls = [x for x in img_urls if x.has_attr("src")]
 
             src_list = [(x.get("src"), 
                         f"{datetime_list[i]}_-_{blog_id}_-_{x.get("src").split("/")[-1]}") for x in img_urls if "diary" in x.get("src")]
