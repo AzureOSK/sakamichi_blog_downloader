@@ -31,3 +31,8 @@
 ## If downloading photos from every member's blog
 1. In cmd or powershell, run `./nogizaka_blog_downloader.exe` or `./hinatazaka_blog_downloader.exe` without the ct_number parameter.
     - E.g. `./nogizaka_blog_downloader.exe --download_location nogizaka_blog_photos` or `./hinatazaka_blog_downloader.exe --download_location hinatazaka_blog_photos`
+
+## macOS Instructions
+1. Download the macOS executables to any directory.
+2. To download all photos from all blogs, just double click the executable file.
+3. If you want to specify a ct_number or a download_location, cd to the file's location in Terminal and run e.g. `./nogizaka_blog_downloader --ct_number 55391 --download_location nogizaka_blog_photos`
