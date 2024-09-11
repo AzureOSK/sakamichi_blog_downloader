@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 import argparse
+import os
 
 parser = argparse.ArgumentParser(
      prog='Hinatazaka Blog Photos Downloader',
@@ -26,60 +27,86 @@ def download_images(ct_number, output_folder_path):
     # blog_urls = soup.find_all('a', {'class': "c-button-blog-detail"})
     # blog_urls[0].get("href")
 
-    # Get list of blog urls, list of datetimes
-    blog_url_list = []
-    datetime_list = []
-    i = -1
-    while True:
-        i = i + 1
-        params["page"] = i
-        print(f"Parsing blog page: {i}")
+    # If output_folder_path is None, set current working directory as output path
+    if output_folder_path is None:
+        output_folder_path = Path(os.getcwd())
 
-        response = requests.get('https://www.hinatazaka46.com/s/official/diary/member/list', params=params)
-
+    # If ct_number is None, download all available member blogs
+    if ct_number is None:
+        response = requests.get('https://www.hinatazaka46.com/s/official/diary/member')
         soup = BeautifulSoup(response.text, 'html.parser')
+        member_blog_list = [
+            (
+                x.text.split("(")[0], 
+                x.get("value").split("ct=")[-1]
+            ) for x in soup.find('select', {'class': "js-select sort"}).find_all('option')
+            if x.get("value").split("ct=")[-1] != ""
+            ]
+        
+        for member_name, ct_number in member_blog_list:
+            print(f"Downloading {member_name}")
+            download_images(ct_number, output_folder_path)
 
-        blog_urls = soup.find_all('a', {'class': "c-button-blog-detail"})
+    # Else, if ct_number is not None, download only photos from one member
+    else:
+        # Get list of blog urls, list of datetimes
+        blog_url_list = []
+        datetime_list = []
+        i = -1
+        while True:
+            i = i + 1
+            params["page"] = i
+            print(f"Parsing blog page: {i}")
 
-        # End of pages
-        if len(blog_urls) == 0:
-            break
+            response = requests.get('https://www.hinatazaka46.com/s/official/diary/member/list', params=params)
 
-        href_list = [f"https://www.hinatazaka46.com{x.get("href")}" for x in blog_urls]
-        blog_url_list.extend(href_list)
+            soup = BeautifulSoup(response.text, 'html.parser')
 
-        blog_dates = soup.find_all('div', {'class': "c-blog-article__date"})
-        fix_datetimes = lambda x: datetime.strptime(x.replace("\n", "").strip(), '%Y.%m.%d %H:%M').strftime('%Y_%m_%d_-_%H_%M')
-        datetimes = [fix_datetimes(x.text) for x in blog_dates]
-        datetime_list.extend(datetimes)
+            # Get member name for use in folder name
+            if i == 0:
+                member_name = soup.find('p', {'class': "bd--prof__name f--head"}).text
 
-    # For each blog url, get list of image urls in the form of tuple (image url, date_time_-_imagename.ext)
-    img_url_list = []
-    for i, blog_url in enumerate(blog_url_list):
+            blog_urls = soup.find_all('a', {'class': "c-button-blog-detail"})
 
-        print(f"Getting image urls from {i}: {blog_url}")
+            # End of pages
+            if len(blog_urls) == 0:
+                break
 
-        blog_id = blog_url.split("/")[-1].split("?")[0]
+            href_list = [f"https://www.hinatazaka46.com{x.get("href")}" for x in blog_urls]
+            blog_url_list.extend(href_list)
 
-        response = requests.get(blog_url, params=params)
+            blog_dates = soup.find_all('div', {'class': "c-blog-article__date"})
+            fix_datetimes = lambda x: datetime.strptime(x.replace("\n", "").strip(), '%Y.%m.%d %H:%M').strftime('%Y_%m_%d_-_%H_%M')
+            datetimes = [fix_datetimes(x.text) for x in blog_dates]
+            datetime_list.extend(datetimes)
 
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # For each blog url, get list of image urls in the form of tuple (image url, date_time_-_imagename.ext)
+        img_url_list = []
+        for i, blog_url in enumerate(blog_url_list):
 
-        img_urls = soup.find_all('img')
+            print(f"Getting image urls from {i}: {blog_url}")
 
-        src_list = [(x.get("src"), 
-                     f"{datetime_list[i]}_-_{blog_id}_-_{x.get("src").split("/")[-1]}") for x in img_urls if "diary" in x.get("src")]
+            blog_id = blog_url.split("/")[-1].split("?")[0]
 
-        img_url_list.extend(src_list)
+            response = requests.get(blog_url, params=params)
 
-    # Create output folder if folder does not exist
-    output_folder_path = Path(output_folder_path)
-    output_folder_path.mkdir(parents=True, exist_ok=True)
+            soup = BeautifulSoup(response.text, 'html.parser')
 
-    photos_downloaded = 0
+            img_urls = soup.find_all('img')
 
-    # For each img_url and filename combination, save 
-    for (img_url, filename) in reversed(img_url_list):
+            src_list = [(x.get("src"), 
+                        f"{datetime_list[i]}_-_{blog_id}_-_{x.get("src").split("/")[-1]}") for x in img_urls if "diary" in x.get("src")]
+
+            img_url_list.extend(src_list)
+
+        # Create output folder if folder does not exist
+        output_folder_path = Path(output_folder_path)/member_name
+        output_folder_path.mkdir(parents=True, exist_ok=True)
+
+        photos_downloaded = 0
+
+        # For each img_url and filename combination, save 
+        for (img_url, filename) in reversed(img_url_list):
             
             output_file_path = output_folder_path/filename
 
@@ -97,10 +124,10 @@ def download_images(ct_number, output_folder_path):
             else:
                 print(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
 
-    print(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
+        print(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
 
     return None
 
 if __name__ == "__main__":
     download_images(CT_NUMBER, OUTPUT_FOLDER_PATH)
-    #download_images(ct_number = 12, output_folder_name = "miku_photos")
+    # download_images(ct_number = 12, output_folder_name = "miku_photos")
