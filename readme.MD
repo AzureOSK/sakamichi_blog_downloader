@@ -22,7 +22,7 @@
 ## If downloading photos from a single Hinatazaka member's blog
 1. Go to [https://www.hinatazaka46.com/s/official/diary/member?ima=0000](https://www.hinatazaka46.com/s/official/diary/member?ima=00005)
 2. Select the member from whose blog you want to download photos from using the dropdown menu.
-3. Look at the url bar, e.g. for Sugawara Satsuki her url is [https://www.hinatazaka46.com/s/official/diary/member/list?ima=0000&ct=12](https://www.hinatazaka46.com/s/official/diary/member/list?ima=0000&ct=12)
+3. Look at the url bar, e.g. for Kanemura Miku her url is [https://www.hinatazaka46.com/s/official/diary/member/list?ima=0000&ct=12](https://www.hinatazaka46.com/s/official/diary/member/list?ima=0000&ct=12)
 4. This means her ct_number is `12`.
 5. In cmd or powershell, run `./hinatazaka_blog_downloader.exe --ct_number 12 --download_location "hinatazaka_blog_photos"`
     - You can also run `./hinatazaka_blog_downloader.exe --ct_number 12 --download_location "C:\Users\<your username>\hinatazaka_blog_photos"`
