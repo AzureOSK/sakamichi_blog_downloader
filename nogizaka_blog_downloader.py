@@ -22,18 +22,13 @@ def download_images(ct_number, output_folder_path):
         'ct': ct_number, # 48009 etc
     }
 
-    # response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER/list', params=params, cookies=cookies, headers=headers)
-    # soup = BeautifulSoup(response.text, 'html.parser')
-    # blog_urls = soup.find_all('a', {'class': "bl--card js-pos a--op hv--thumb"})
-    # blog_urls[0].get("href")
-
     # If output_folder_path is None, set current working directory as output path
     if output_folder_path is None:
         output_folder_path = Path(os.getcwd())
 
     # If ct_number is None, download all available member blogs
     if ct_number is None:
-        response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER', params=params)
+        response = requests.get('https://www.nogizaka46.com/s/n46/diary/MEMBER')
         soup = BeautifulSoup(response.text, 'html.parser')
         member_blog_list = [
             (
@@ -86,7 +81,7 @@ def download_images(ct_number, output_folder_path):
 
             blog_id = blog_url.split("/")[-1].split("?")[0]
 
-            response = requests.get(blog_url, params=params)
+            response = requests.get(blog_url)
 
             soup = BeautifulSoup(response.text, 'html.parser')
 

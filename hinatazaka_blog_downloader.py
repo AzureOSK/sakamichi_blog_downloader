@@ -22,11 +22,6 @@ def download_images(ct_number, output_folder_path):
         'ct': ct_number, # 48009 etc
     }
 
-    # response = requests.get('https://www.hinatazaka46.com/s/official/diary/member/list', params=params)
-    # soup = BeautifulSoup(response.text, 'html.parser')
-    # blog_urls = soup.find_all('a', {'class': "c-button-blog-detail"})
-    # blog_urls[0].get("href")
-
     # If output_folder_path is None, set current working directory as output path
     if output_folder_path is None:
         output_folder_path = Path(os.getcwd())
@@ -88,7 +83,7 @@ def download_images(ct_number, output_folder_path):
 
             blog_id = blog_url.split("/")[-1].split("?")[0]
 
-            response = requests.get(blog_url, params=params)
+            response = requests.get(blog_url)
 
             soup = BeautifulSoup(response.text, 'html.parser')
 
