@@ -34,7 +34,7 @@ def download_images(ct_number, output_folder_path):
             (
                 x.text.split("(")[0], 
                 x.get("value").split("ct=")[-1]
-            ) for x in soup.find('select', {'class': "js-select sort"}).find_all('option')
+            ) for x in soup.find('select', {'name': "member_select"}).find_all('option')
             if x.get("value").split("ct=")[-1] != ""
             ]
         
