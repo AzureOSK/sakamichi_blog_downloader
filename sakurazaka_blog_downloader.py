@@ -19,7 +19,7 @@ def download_images(ct_number, output_folder_path):
 
     params = {
         'page': '5',
-        'ct': ct_number, # 48009 etc
+        'ct': str(ct_number).zfill(2), # 48009 etc
     }
 
     # If output_folder_path is None, set current working directory as output path
