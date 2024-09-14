@@ -4,6 +4,8 @@ from datetime import datetime
 from pathlib import Path
 import argparse
 import os
+import sys
+from loguru import logger
 
 parser = argparse.ArgumentParser(
      prog='Sakurazaka Blog Photos Downloader',
@@ -11,9 +13,20 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-c', '--ct_number', type = int, help = "When you go to the page with all of the members' blogs as selected in the dropdown menu in https://sakurazaka46.com/s/s46/diary/blog/list?ima=0000, there will be a 'ct' number in the URL. E.g. for Moriya Rena (https://sakurazaka46.com/s/s46/diary/blog/list?ima=0000&ct=58) the ct number is 58")
 parser.add_argument('-d', '--download_location', type = str, help = r"The download location for the downloaded messages; can be relative or absolute. E.g. 'C:\Users\<your username>\Downloads\rena_photos' or just 'rena_photos'")
+parser.add_argument('-l', '--log_filename', type = str, help = "Filename to be used for the logfile e.g. 'sakurazaka_blog_downloader_log.txt'; if unspecified, there will be no logfile.")
 args = parser.parse_args()
 CT_NUMBER = args.ct_number
 OUTPUT_FOLDER_PATH = args.download_location
+LOG_FILENAME = args.log_filename
+
+logger.remove(0) # Remove default logger so that we can set stderr to TRACE
+if LOG_FILENAME is not None:
+    logger.add(Path(OUTPUT_FOLDER_PATH)/LOG_FILENAME, level="INFO")
+    logger.add(sys.stderr, level="TRACE")
+else:
+    logger.add(sys.stderr, level="TRACE")
+
+logger.info(f"Run on {datetime.now()}")
 
 def download_images(ct_number, output_folder_path):
 
@@ -39,7 +52,7 @@ def download_images(ct_number, output_folder_path):
             ]
         
         for member_name, ct_number in member_blog_list:
-            print(f"Downloading {member_name}")
+            logger.info(f"Downloading {member_name}")
             download_images(ct_number, output_folder_path)
 
     # Else, if ct_number is not None, download only photos from one member
@@ -51,7 +64,7 @@ def download_images(ct_number, output_folder_path):
         while True:
             i = i + 1
             params["page"] = i
-            print(f"Parsing blog page: {i}")
+            logger.trace(f"Parsing blog page: {i}")
 
             response = requests.get('https://sakurazaka46.com/s/s46/diary/blog/list', params=params)
 
@@ -81,7 +94,7 @@ def download_images(ct_number, output_folder_path):
         img_url_list = []
         for i, blog_url in enumerate(blog_url_list):
 
-            print(f"Getting image urls from {i}: {blog_url}")
+            logger.trace(f"Getting image urls from {i}: {blog_url}")
 
             blog_id = blog_url.split("/")[-1].split("?")[0]
 
@@ -115,18 +128,18 @@ def download_images(ct_number, output_folder_path):
             # If file doesn't exist, download it, else print info and don't download
             if not output_file_path.is_file():
                 try:
-                    print(f"Downloading {img_url} to {output_file_path.resolve()}")
+                    logger.trace(f"Downloading {img_url} to {output_file_path.resolve()}")
                     image = requests.get(img_url)
                     with open(output_file_path, 'wb') as f:
                         f.write(image.content)
                     photos_downloaded += 1
                 except:
-                    print(f"Couldn't download {img_url}!")
+                    logger.debug(f"Couldn't download {img_url}!")
                     continue
             else:
-                print(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
+                logger.debug(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
 
-        print(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
+        logger.info(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
 
     return None
 
