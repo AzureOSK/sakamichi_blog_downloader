@@ -9,6 +9,7 @@
 ## Parameters
 - `--ct_number`: The ct number as specified in the url of a member's blog page (see below)
 - `--download_location`: The location of where the photos will be saved. This can be a relative or absolute path.
+- `--log_filename`: The filename to be used for the logfile e.g. 'nogizaka_log.txt'; if unspecified, there will be no logfile.
 
 ## If downloading photos from a single Nogizaka member's blog
 1. Go to [https://www.nogizaka46.com/s/n46/diary/MEMBER?ima=0955](https://www.nogizaka46.com/s/n46/diary/MEMBER?ima=0955)
@@ -36,3 +37,8 @@
 1. Download the macOS executables to any directory.
 2. To download all photos from all blogs, just double click the executable file.
 3. If you want to specify a ct_number or a download_location, cd to the file's location in Terminal and run e.g. `./nogizaka_blog_downloader --ct_number 55391 --download_location nogizaka_blog_photos`
+
+## Commands used to create the executables
+- `pyinstaller --onefile '.\nogizaka_blog_downloader.py' --name='nogizaka_blog_downloader_win'`
+- `pyinstaller --onefile '.\hinatazaka_blog_downloader.py' --name='hinatazaka_blog_downloader_win'`
+- `pyinstaller --onefile '.\sakurazaka_blog_downloader.py' --name='sakurazaka_blog_downloader_win'`
