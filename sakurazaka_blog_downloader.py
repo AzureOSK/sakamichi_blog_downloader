@@ -82,7 +82,7 @@ def download_images(ct_number, output_folder_path):
 
             blog_urls = soup.find('ul', {'class': "com-blog-part box3 fxpc"}).find_all('a')
 
-            href_list = [f"https://www.hinatazaka46.com{x.get("href")}" for x in blog_urls]
+            href_list = [f"https://www.sakurazaka46.com{x.get("href")}" for x in blog_urls]
             blog_url_list.extend(href_list)
 
             # blog_dates = soup.find_all('div', {'class': "blog-foot"})
