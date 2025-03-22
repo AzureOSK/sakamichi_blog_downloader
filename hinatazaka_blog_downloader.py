@@ -5,6 +5,7 @@ from pathlib import Path
 import argparse
 import os
 import sys
+import json
 from loguru import logger
 
 parser = argparse.ArgumentParser(
@@ -38,6 +39,14 @@ def download_images(ct_number, output_folder_path):
     # If output_folder_path is None, set current working directory as output path
     if output_folder_path is None:
         output_folder_path = Path(os.getcwd())
+
+    # If prior list of downloaded_blogs exists, read list of downloaded blogs
+    downloaded_blogs_json_path = Path(output_folder_path)/"downloaded_blogs.json"
+    if Path.exists(downloaded_blogs_json_path):
+        with open(downloaded_blogs_json_path, 'rb') as fp:
+            downloaded_blogs_list = json.load(fp)
+    else:
+        downloaded_blogs_list = []
 
     # If ct_number is None, download all available member blogs
     if ct_number is None:
@@ -89,6 +98,7 @@ def download_images(ct_number, output_folder_path):
             datetime_list.extend(datetimes)
 
         # For each blog url, get list of image urls in the form of tuple (image url, date_time_-_imagename.ext)
+        blog_url_list = [x for x in blog_url_list if x.split("?")[0] not in downloaded_blogs_list] # Only download blog urls not in the downloaded blogs list
         img_url_list = []
         for i, blog_url in enumerate(blog_url_list):
 
@@ -135,6 +145,13 @@ def download_images(ct_number, output_folder_path):
                 logger.debug(f"Not downloading {img_url} as {filename} already exists in {output_folder_path.resolve()}!")
 
         logger.info(f"{photos_downloaded} photos downloaded to {output_folder_path.resolve()}!")
+
+        # Add list of downloaded blog urls to a json to be referenced upon next run to save time
+        blog_url_list_parse = [x.split("?")[0] for x in blog_url_list]
+        new_downloaded_blogs_list = downloaded_blogs_list + blog_url_list_parse
+        with open(downloaded_blogs_json_path, "w") as fp:
+            json.dump(new_downloaded_blogs_list, fp)
+        logger.info(f"{len(blog_url_list_parse)} blog urls added to {len(downloaded_blogs_list)} previously downloaded blog urls in {downloaded_blogs_json_path.resolve()}!")
 
     return None
 
