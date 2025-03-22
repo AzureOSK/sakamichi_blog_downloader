@@ -27,6 +27,7 @@ if LOG_FILENAME is not None:
 else:
     logger.add(sys.stderr, level="TRACE")
 
+logger.info("-" * 130)
 logger.info(f"Run on {datetime.now()}")
 
 def download_images(ct_number, output_folder_path):
