@@ -33,7 +33,7 @@ logger.info(f"Run on {datetime.now()}")
 def download_images(ct_number, output_folder_path):
 
     params = {
-        'page': '5',
+        'page': '0',
         'ct': str(ct_number).zfill(2), # 48009 etc
     }
 
@@ -82,9 +82,7 @@ def download_images(ct_number, output_folder_path):
 
             # Get member name for use in folder name
             if i == 0:
-                member_name = soup.find('dt', {'class': "name"})
-                member_name.span.decompose()
-                member_name = member_name.get_text(strip=True)
+                member_name = soup.find('h2', {'class': "inner"}).text.strip().replace("　公式ブログ　一覧", "")
             
             # End of pages
             if soup.find('ul', {'class': "com-blog-part box3 fxpc"}) == None:
