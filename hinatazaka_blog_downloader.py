@@ -82,7 +82,7 @@ def download_images(ct_number, output_folder_path):
 
             # Get member name for use in folder name
             if i == 0:
-                member_name = soup.find('div', {'class': "c-blog-member__name"}).text.strip()
+                member_name = soup.find('h3', {'class': "c-blog-page__subtitle"}).text.strip().replace(" 公式ブログ", "")
 
             blog_urls = soup.find_all('a', {'class': "c-button-blog-detail"})
 
